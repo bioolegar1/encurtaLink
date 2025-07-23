@@ -1,5 +1,6 @@
 package olegari.bio.encurtalink.service;
 
+import jakarta.servlet.Servlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import olegari.bio.encurtalink.dto.HistoryResponse;
@@ -7,6 +8,7 @@ import olegari.bio.encurtalink.model.UrlMapping;
 import olegari.bio.encurtalink.repository.UrlMappingRepository;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -45,6 +47,8 @@ public class UrlShortenerService {
                 urlMappingRepository.delete(urlMapping);
                 return Optional.empty();
             }
+            urlMapping.setClickCount(urlMapping.getClickCount() + 1);
+            urlMappingRepository.save(urlMapping);
         }
         return urlMappingOptional;
     }
@@ -54,8 +58,7 @@ public class UrlShortenerService {
         List<UrlMapping> recentMappings = urlMappingRepository.findTop10ByOrderByCreatedAtDesc();
         ;
         //Constroi a Url base para os lings curtos
-        String baseUrl = request.getRequestURL().toString();
-
+        String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
         return recentMappings.stream()
                 .map(mapping -> new HistoryResponse(
                         baseUrl + "/" + mapping.getShortKey(),
