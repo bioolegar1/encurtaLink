@@ -58,7 +58,7 @@ public class UrlShortenerService {
         return recentMappings.stream()
                 .map(mapping-> {
                     String shortUrl = baseUrl + "/" + mapping.getShortKey();
-                    String qrCodeUrl = baseUrl + "/qrcode" + mapping.getShortKey();
+                    String qrCodeUrl = baseUrl + "/qrcode/" + mapping.getShortKey();
 
                     return new HistoryResponse(
                             shortUrl,
