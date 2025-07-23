@@ -9,7 +9,6 @@ import olegari.bio.encurtalink.repository.UrlMappingRepository;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -19,7 +18,6 @@ import java.util.stream.Collectors;
 public class UrlShortenerService {
 
     private final UrlMappingRepository urlMappingRepository;
-
 
     private static final int SHORT_KEY_LENGTH = 7;
     private static final long EXPIRATION_DAYS = 30; // URL expira em 30 dias
@@ -32,11 +30,9 @@ public class UrlShortenerService {
         String shortKey = generateUniqueShortKey();
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime expiresAt = now.plusDays(EXPIRATION_DAYS);
-
         UrlMapping urlMapping = new UrlMapping(originalUrl, shortKey, now, expiresAt);
         return urlMappingRepository.save(urlMapping);
     }
-
     //metodo para contar os clicks
     @Transactional
     public Optional<UrlMapping> getOriginalUrlAndIncrementClick(String shortKey) {
@@ -60,12 +56,19 @@ public class UrlShortenerService {
         //Constroi a Url base para os lings curtos
         String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
         return recentMappings.stream()
-                .map(mapping -> new HistoryResponse(
-                        baseUrl + "/" + mapping.getShortKey(),
-                        mapping.getOriginalUrl(),
-                        mapping.getClickCount(),
-                        mapping.getDaysToExpire()
-                        ))
+                .map(mapping-> {
+                    String shortUrl = baseUrl + "/" + mapping.getShortKey();
+                    String qrCodeUrl = baseUrl + "/qrcode" + mapping.getShortKey();
+
+                    return new HistoryResponse(
+                            shortUrl,
+                            mapping.getOriginalUrl(),
+                            mapping.getClickCount(),
+                            mapping.getDaysToExpire(),
+                            qrCodeUrl
+
+                    );
+                })
                 .collect(Collectors.toList());
     }
 
