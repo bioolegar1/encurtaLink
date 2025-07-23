@@ -9,9 +9,11 @@ import java.util.Optional;
 
 @Repository
 public interface UrlMappingRepository extends JpaRepository<UrlMapping, Long> {
-    Optional<UrlMapping> findByOriginalUrl(String originalUrl);
 
     Optional<UrlMapping> findByShortKey(String shortKey);
 
-    List<UrlMapping> findTop10ByCreatedAtDesc();
+    // --- CORREÇÃO FINAL AQUI ---
+    // A sintaxe correta precisa do "By" para separar a busca da ordenação.
+    List<UrlMapping> findTop10ByOrderByCreatedAtDesc();
 }
+

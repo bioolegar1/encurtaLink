@@ -51,7 +51,8 @@ public class UrlShortenerService {
 
     //Metodo para buscar e formatar historico
     public List<HistoryResponse> getHistory(HttpServletRequest request){
-        List<UrlMapping> recentMappings = urlMappingRepository.findTop10ByCreatedAtDesc();
+        List<UrlMapping> recentMappings = urlMappingRepository.findTop10ByOrderByCreatedAtDesc();
+        ;
         //Constroi a Url base para os lings curtos
         String baseUrl = request.getRequestURL().toString();
 

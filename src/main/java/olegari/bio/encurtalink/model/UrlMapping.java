@@ -36,7 +36,7 @@ public class UrlMapping {
     @Column(nullable = false)
     private LocalDateTime expiresAt;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "bigint default 0")
     private long clickCount = 0;
 
     public UrlMapping(String originalUrl, String shortKey, LocalDateTime createdAt, LocalDateTime expiresAt) {
