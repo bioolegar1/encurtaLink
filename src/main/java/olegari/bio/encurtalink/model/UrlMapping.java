@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Entity
 @Table(name = "url_mappings")
@@ -35,11 +36,18 @@ public class UrlMapping {
     @Column(nullable = false)
     private LocalDateTime expiresAt;
 
+    @Column(nullable = false)
+    private long clickCount = 0;
+
     public UrlMapping(String originalUrl, String shortKey, LocalDateTime createdAt, LocalDateTime expiresAt) {
         this.originalUrl = originalUrl;
         this.shortKey = shortKey;
         this.createdAt = createdAt;
         this.expiresAt = expiresAt;
+    }
+
+    public long getDaysToExpire() {
+        return ChronoUnit.DAYS.between(LocalDateTime.now(), this.expiresAt);
     }
 
     public boolean isExpired() {

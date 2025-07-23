@@ -2,6 +2,7 @@ package olegari.bio.encurtalink.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import olegari.bio.encurtalink.dto.HistoryResponse;
 import olegari.bio.encurtalink.dto.ShortenUrlRequest;
 import olegari.bio.encurtalink.dto.ShortenUrlResponse;
 import olegari.bio.encurtalink.model.UrlMapping;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -36,12 +38,20 @@ public class UrlShortenerController {
 
     @GetMapping("/{shortKey:[a-zA-Z0-9]{5,10}}")
     public void redirectToOriginalUrl(@PathVariable String shortKey, HttpServletResponse response) throws IOException {
-        Optional<UrlMapping> urlMappingOptional = urlShortenerService.getOriginalUrl(shortKey);
+
+        //metodo que incrementa o click
+        Optional<UrlMapping> urlMappingOptional = urlShortenerService.getOriginalUrlAndIncrementClick(shortKey);
 
         if (urlMappingOptional.isPresent()) {
             response.sendRedirect(urlMappingOptional.get().getOriginalUrl());
         } else {
             response.sendError(HttpStatus.NOT_FOUND.value(), "URL not found or expired");
         }
+    }
+
+    @GetMapping("/history")
+    public ResponseEntity<List<HistoryResponse>> getHistory(HttpServletRequest request) {
+        List<HistoryResponse> history = urlShortenerService.getHistory(request);
+        return ResponseEntity.ok(history);
     }
 }
