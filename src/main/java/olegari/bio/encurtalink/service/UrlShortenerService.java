@@ -6,6 +6,7 @@ import jakarta.transaction.Transactional;
 import olegari.bio.encurtalink.dto.HistoryResponse;
 import olegari.bio.encurtalink.model.UrlMapping;
 import olegari.bio.encurtalink.repository.UrlMappingRepository;
+import olegari.bio.encurtalink.user.User;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -26,13 +27,17 @@ public class UrlShortenerService {
         this.urlMappingRepository = urlMappingRepository;
     }
 
-    public UrlMapping shortenUrl(String originalUrl) {
+    public UrlMapping shortenUrl(String originalUrl, User user) {
         String shortKey = generateUniqueShortKey();
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime expiresAt = now.plusDays(EXPIRATION_DAYS);
-        UrlMapping urlMapping = new UrlMapping(originalUrl, shortKey, now, expiresAt);
+        UrlMapping urlMapping = new UrlMapping(originalUrl, shortKey, now, expiresAt, user);
+
         return urlMappingRepository.save(urlMapping);
     }
+
+
+
     //metodo para contar os clicks
     @Transactional
     public Optional<UrlMapping> getOriginalUrlAndIncrementClick(String shortKey) {
@@ -48,6 +53,9 @@ public class UrlShortenerService {
         }
         return urlMappingOptional;
     }
+
+
+
 
     //Metodo para buscar e formatar historico
     public List<HistoryResponse> getHistory(HttpServletRequest request){

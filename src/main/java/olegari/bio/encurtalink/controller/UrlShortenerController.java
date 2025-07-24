@@ -8,9 +8,11 @@ import olegari.bio.encurtalink.dto.ShortenUrlResponse;
 import olegari.bio.encurtalink.model.UrlMapping;
 import olegari.bio.encurtalink.service.UrlShortenerService;
 import jakarta.servlet.http.HttpServletResponse;
+import olegari.bio.encurtalink.user.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,8 +28,11 @@ public class UrlShortenerController {
     }
 
     @PostMapping("/shorten-url")
-    public ResponseEntity<ShortenUrlResponse> shortenUrl(@Valid @RequestBody ShortenUrlRequest request, HttpServletRequest servletRequest) {
-        UrlMapping urlMapping = urlShortenerService.shortenUrl(request.url());
+    public ResponseEntity<ShortenUrlResponse> shortenUrl(@Valid @RequestBody ShortenUrlRequest request,
+                                                            HttpServletRequest servletRequest,
+                                                            Authentication authentication) {
+        User currentUser = (User) authentication.getPrincipal();
+        UrlMapping urlMapping = urlShortenerService.shortenUrl(request.url(), currentUser);
 
         String shortUrl = servletRequest.getScheme() + "://" + servletRequest.getServerName() +
                 ":" + servletRequest.getServerPort() + servletRequest.getContextPath() +
